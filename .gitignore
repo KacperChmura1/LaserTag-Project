@@ -3,19 +3,11 @@ dane.txt
 pdf/
 text/
 .ipynb_checkpoints/
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> App
 y_test.csv
 X_test.csv
 saved_steps.pkl
 saved_steps_under_100.pkl
 __pycache__/
 
-<<<<<<< HEAD
-=======
-=======
->>>>>>> Deep_Learning
->>>>>>> App
+
 
