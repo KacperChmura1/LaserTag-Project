@@ -33,6 +33,10 @@ def forest():
     with open ("forest.pkl", "rb") as file:
         data = pickle.load(file)
     return data
+def KNN():
+    with open ("KNN.pkl", "rb") as file:
+        data = pickle.load(file)
+    return data
 
     #with open ("forest.pkl", "rb") as file:
     #    data = pickle.load(file)
@@ -61,15 +65,15 @@ def show_predict_page():
     dmg_get = st.number_input("DMG Get",step = 1)
     
 
-    model_choose = st.sidebar.selectbox("Model choose", {"Gradient Boost", "Linear Regression","Forest"})
+    model_choose = st.sidebar.selectbox("Model choose", {"Gradient Boost", "Linear Regression","Forest","KNN"})
     if model_choose == "Gradient Boost":
         model = load_gradient_boost()
     elif model_choose == "Linear Regression":
         model = linear_regression()
     elif model_choose == "Forest":
         model = forest()
-    elif model_choose == "Linear Regression":
-        model = linear_regression()
+    elif model_choose == "KNN":
+        model = KNN()
     elif model_choose == "Linear Regression":
         model = linear_regression()
 
