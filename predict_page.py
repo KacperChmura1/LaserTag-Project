@@ -9,6 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn import metrics
+import plotly
+import plotly.express as px
 import tensorflow as tf
 
 def load_data():
@@ -113,9 +115,16 @@ def show_predict_page():
         scater = plt.scatter(y_test,ratings)
          #Perfect predictions
         line = plt.plot(y_test,y_test,'r')
+        #st.plotly_chart(fig, use_container_width=True)
+        
+        #fig2 = px.line(x = y_test, y = y_test)
+        #fig2.add_scatter(x = y_test, y = ratings, mode = "markers",name="Predictions")
+        #fig2.show()
+       
         st.title("The effectiveness of our model")
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">The red line is the correct answer and the blue point is our prediction</p>', unsafe_allow_html=True)
         st.pyplot(fig)
-       
+
+        
 
     
