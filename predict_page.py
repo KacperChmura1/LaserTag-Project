@@ -11,7 +11,9 @@ import seaborn as sns
 from sklearn import metrics
 import plotly
 import plotly.express as px
-import tensorflow as tf
+import plotly.figure_factory as ff
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 def load_data():
     df = pd.read_csv("Stats.csv",index_col = 0)
@@ -57,6 +59,7 @@ df_X = df.drop("Rating", axis = 1)
 X_test = pd.read_csv("X_test.csv",index_col = 0)
 y_test = pd.read_csv("y_test.csv",index_col = 0)
 y_mean = np.mean(y_test)
+model_choose = "model"
 def show_predict_page():
     st.title("Rating Predictions")
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> Model predict well if rating is bellow 100!</p>', unsafe_allow_html=True)
@@ -97,7 +100,8 @@ def show_predict_page():
         true_value = f'<p style="font-family:Courier; color:Green; font-size: 30px;">Real Rating: {real_rating:.2f}</p>'
 
         st.markdown(prediction, unsafe_allow_html=True)
-        st.markdown(true_value, unsafe_allow_html=True)  
+        st.markdown(true_value, unsafe_allow_html=True)
+        st.markdown(type(y_test.values), unsafe_allow_html=True)   
 
         ratings = model.predict(X_test)
         st.title("How good is our model")
@@ -111,19 +115,40 @@ def show_predict_page():
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">RMSE: {rmse:.2f}</p>', unsafe_allow_html=True)
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">Error in %: {error_y_mean[0]:.2f}%</p>', unsafe_allow_html=True)
 
-        fig = plt.figure()
+        #fig = plt.figure()
         scater = plt.scatter(y_test,ratings)
          #Perfect predictions
-        line = plt.plot(y_test,y_test,'r')
-        #st.plotly_chart(fig, use_container_width=True)
+        #line = plt.plot(y_test,y_test)
+        #st.plotly_chart(line, use_container_width=True)
+        y_test_list = y_test.values.tolist()
+        ratings_list = ratings.tolist()
+        y_test_unpacked = []
+        for c in y_test_list:
+            for t in c:
+                y_test_unpacked.append(t)
+        #fig = px.scatter(x=y_test_unpacked, y = ratings_list)
+        #fig2 = px.line(x=y_test_unpacked, y = y_test_unpacked)
+        #st.plotly_chart(fig)
+        fig3 = make_subplots(specs=[[{"secondary_y": True}]])
+
+        # Add traces
+        fig3.add_trace(
+            go.Scatter(x=y_test_unpacked, y = np.round(ratings_list,2), name="Predictions",mode = "markers"),
+            secondary_y=False,
+        )
+
+        fig3.add_trace(
+            go.Scatter(x=y_test_unpacked, y = y_test_unpacked, name="Real Ratings"),
+            secondary_y=True,
+        )
+        # Add figure title
+        fig3.update_layout(
+        title_text=f" {model_choose}: Predictions vs True Values"
+        )
+
+
+        st.plotly_chart(fig3)
         
-        #fig2 = px.line(x = y_test, y = y_test)
-        #fig2.add_scatter(x = y_test, y = ratings, mode = "markers",name="Predictions")
-        #fig2.show()
-       
-        st.title("The effectiveness of our model")
-        st.markdown(f'<p style="font-family:Courier; font-size: 20px;">The red line is the correct answer and the blue point is our prediction</p>', unsafe_allow_html=True)
-        st.pyplot(fig)
 
         
 
