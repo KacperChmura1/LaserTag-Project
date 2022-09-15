@@ -34,6 +34,7 @@ df = load_data()
 df_X = df.drop("Rating", axis = 1)
 #Loading Data to Check Model(avoid data leakage)
 X_test = pd.read_csv("X_test.csv",index_col = 0)
+X_test_3 = pd.read_csv("X_test_3.csv",index_col = 0)
 y_test = pd.read_csv("y_test.csv",index_col = 0)
 y_mean = np.mean(y_test)
 
@@ -51,21 +52,29 @@ def show_predict_page():
     deaths = st.number_input("Deaths",step = 1)
     dmg_get = st.number_input("DMG Get",step = 1)
     #Select box with models
+    cheated = False
+    cheated = st.checkbox("Cheated Model")
+    if cheated:
+        cheat_string = "_3.pkl"
+    else:
+        cheat_string = ".pkl"
+    
+           
     model_choose = st.sidebar.selectbox("Model choose", {"Gradient Boost", "Linear Regression","Forest","KNN","SVR Linear"})
     if model_choose == "Gradient Boost":
-        model_name = "Models/gradient.pkl"
+        model_name = "Models/gradient"+cheat_string
         model = load_model(model_name)
     elif model_choose == "Linear Regression":
-        model_name = "Models/linear_regression.pkl"
+        model_name = "Models/linear_regression"+cheat_string
         model = load_model(model_name)
     elif model_choose == "Forest":
-        model_name = "Models/forest.pkl"
+        model_name = "Models/forest"+cheat_string
         model = load_model(model_name)
     elif model_choose == "KNN":
-        model_name = "Models/KNN.pkl"
+        model_name = "Models/KNN"+cheat_string
         model = load_model(model_name)
     elif model_choose == "SVR Linear":
-        model_name = "Models/SVRLinear.pkl"
+        model_name = "Models/SVRLinear"+cheat_string
         model = load_model(model_name)
 
     ok = st.button("Calculate Rating")
@@ -76,7 +85,10 @@ def show_predict_page():
         else:
             accuracy = (hits / shot_fired)*100
         #Predicting Inputed Vale
-        X = np.array([[accuracy,shot_fired,hits,deaths, dmg_get]])
+        if cheat_string == ".pkl":
+            X = np.array([[accuracy,shot_fired,hits,deaths, dmg_get]])
+        else:
+            X = np.array([[accuracy,hits, dmg_get]])
         rating = model.predict(X)
         real_rating = (hits/(dmg_get + 1) * (accuracy*2+100))/3
         
@@ -86,7 +98,11 @@ def show_predict_page():
         st.markdown(prediction, unsafe_allow_html=True)
         st.markdown(true_value, unsafe_allow_html=True)  
         #Predict Values from Loaded Data
-        ratings = model.predict(X_test)
+        if cheat_string == ".pkl":
+            ratings = model.predict(X_test)
+        else:
+            ratings = model.predict(X_test_3)
+        
         st.title("How good is our model")
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">For best results our model was tested with multiple hyper parameters with GridSearchCV.</p>', unsafe_allow_html=True)
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">Here are the results:</p>', unsafe_allow_html=True)
@@ -112,7 +128,7 @@ def show_predict_page():
         fig3.add_trace(
             go.Scatter(x=y_test_unpacked, y = np.round(ratings_list,2), name="Predictions",mode = "markers",
             marker=dict(
-            color='LightSkyBlue',
+            color='rgba(135, 206, 250, 0.6)',
             size=8
             )
         ),
@@ -126,6 +142,8 @@ def show_predict_page():
         title_text=f" {model_choose}: Predictions vs True Values"
         )
         st.plotly_chart(fig3)
+        #Add model_3 to app
+        #Describe project in explore page!!!!
         
 
         
