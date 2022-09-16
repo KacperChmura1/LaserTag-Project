@@ -1,12 +1,4 @@
-Stats.csv
-dane.txt
-pdf/
-text/
 .ipynb_checkpoints/
-y_test.csv
-X_test.csv
-saved_steps.pkl
-saved_steps_under_100.pkl
 __pycache__/
 
 
