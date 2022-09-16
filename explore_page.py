@@ -1,7 +1,7 @@
 #from statistics import LinearRegression, linear_regression
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import seaborn as sns
 import base64
 from PIL import Image
