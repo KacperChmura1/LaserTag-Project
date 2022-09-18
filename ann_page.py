@@ -18,7 +18,7 @@ scaler = MinMaxScaler()
 X_train = scaler.fit_transform(X_train)
 X_test_s = scaler.transform(X_test)
 def load_model():
-    model = tf.keras.models.load_model("models/ann.hdf5")
+    model = tf.keras.models.load_model("Models/ann.hdf5")
     return model
 def show_ann_page():
     ann_model = load_model()
