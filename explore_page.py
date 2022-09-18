@@ -28,7 +28,7 @@ SVRLinear = load_model("Models/SVRLinear.pkl")
 SVRLinear_3 = load_model("Models/SVRLinear_3.pkl")
 KNN = load_model("Models/KNN.pkl")
 KNN_3 = load_model("Models/KNN_3.pkl")
-ann = tf.keras.models.load_model("models/ann.hdf5")
+ann = tf.keras.models.load_model("Models/ann.hdf5")
 
 def proc(acc):
     acc = acc[:-1]
