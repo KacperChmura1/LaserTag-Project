@@ -10,13 +10,14 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
 from sklearn import metrics
+import tensorflow as tf
 def load_model(model_name):
     with open (model_name, "rb") as file:
         data = pickle.load(file)
     return data
-X_test = pd.read_csv("X_test.csv",index_col = 0)
-X_test_3 = pd.read_csv("X_test_3.csv",index_col = 0)
-y_test = pd.read_csv("y_test.csv",index_col = 0)
+X_test = pd.read_csv("data/X_test.csv",index_col = 0)
+X_test_3 = pd.read_csv("data/X_test_3.csv",index_col = 0)
+y_test = pd.read_csv("data/y_test.csv",index_col = 0)
 Linear_reg = load_model("Models/linear_regression.pkl")
 Linear_reg_3 = load_model("Models/linear_regression_3.pkl")
 forest = load_model("Models/forest.pkl")
@@ -27,6 +28,7 @@ SVRLinear = load_model("Models/SVRLinear.pkl")
 SVRLinear_3 = load_model("Models/SVRLinear_3.pkl")
 KNN = load_model("Models/KNN.pkl")
 KNN_3 = load_model("Models/KNN_3.pkl")
+ann = tf.keras.models.load_model("models/ann.hdf5")
 
 def proc(acc):
     acc = acc[:-1]
@@ -130,6 +132,8 @@ def show_explore_page():
     plots(gradient,gradient_3,"Gradient")
     plots(SVRLinear,SVRLinear_3,"SVR Linear")
     plots(KNN,KNN_3,"KNN")
+    #plots(ann,ann,"ANN")
+    #End comp. of Ann and Ann_3
     
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;margin-top:50px;"> {paragraph4} </p>', unsafe_allow_html=True)
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> {paragraph5} </p>', unsafe_allow_html=True)

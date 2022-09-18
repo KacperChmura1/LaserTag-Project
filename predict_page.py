@@ -33,9 +33,9 @@ def header(url):
 df = load_data()
 df_X = df.drop("Rating", axis = 1)
 #Loading Data to Check Model(avoid data leakage)
-X_test = pd.read_csv("X_test.csv",index_col = 0)
-X_test_3 = pd.read_csv("X_test_3.csv",index_col = 0)
-y_test = pd.read_csv("y_test.csv",index_col = 0)
+X_test = pd.read_csv("data/X_test.csv",index_col = 0)
+X_test_3 = pd.read_csv("data/X_test_3.csv",index_col = 0)
+y_test = pd.read_csv("data/y_test.csv",index_col = 0)
 y_mean = np.mean(y_test)
 
 model_choose = "model"
@@ -96,13 +96,12 @@ def show_predict_page():
         true_value = f'<p style="font-family:Courier; color:Green; font-size: 30px;">Real Rating: {real_rating:.2f}</p>'
         #Display Results
         st.markdown(prediction, unsafe_allow_html=True)
-        st.markdown(true_value, unsafe_allow_html=True)  
+        st.markdown(true_value, unsafe_allow_html=True) 
         #Predict Values from Loaded Data
         if cheat_string == ".pkl":
             ratings = model.predict(X_test)
         else:
-            ratings = model.predict(X_test_3)
-        
+            ratings = model.predict(X_test_3)     
         st.title("How good is our model")
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">For best results our model was tested with multiple hyper parameters with GridSearchCV.</p>', unsafe_allow_html=True)
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">Here are the results:</p>', unsafe_allow_html=True)
@@ -121,7 +120,6 @@ def show_predict_page():
         for c in y_test_list:
             for t in c:
                 y_test_unpacked.append(t)
-        
         fig3 = make_subplots(specs=[[{"secondary_y": True}]])
 
         # Add traces
