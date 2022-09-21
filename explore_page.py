@@ -15,6 +15,7 @@ def load_model(model_name):
     with open (model_name, "rb") as file:
         data = pickle.load(file)
     return data
+#Loading models
 X_test = pd.read_csv("data/X_test.csv",index_col = 0)
 X_test_3 = pd.read_csv("data/X_test_3.csv",index_col = 0)
 y_test = pd.read_csv("data/y_test.csv",index_col = 0)
@@ -33,7 +34,6 @@ ann = tf.keras.models.load_model("Models/ann.hdf5")
 def proc(acc):
     acc = acc[:-1]
     return acc
-@st.cache
 def load_data():
     df = pd.read_csv("Stats.csv",index_col = 0)
     df["Accuracy"] = df["Accuracy"].apply(proc).apply(float)

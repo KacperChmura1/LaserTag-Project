@@ -14,14 +14,6 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-#Loading data functions
-def load_data():
-    df = pd.read_csv("Stats.csv",index_col = 0)
-    df["Accuracy"] = df["Accuracy"].apply(proc).apply(float)
-    return df
-def proc(acc):
-    acc = acc[:-1]
-    return acc
 #Loading model function    
 def load_model(model_name):
     with open (model_name, "rb") as file:
@@ -30,8 +22,7 @@ def load_model(model_name):
 #Header
 def header(url):
      st.subheader(f'<p style="background-color:#0066cc;color:#33ff33;font-size:24px;border-radius:2%;">{url}</p>')
-df = load_data()
-df_X = df.drop("Rating", axis = 1)
+
 #Loading Data to Check Model(avoid data leakage)
 X_test = pd.read_csv("data/X_test.csv",index_col = 0)
 X_test_3 = pd.read_csv("data/X_test_3.csv",index_col = 0)
@@ -39,8 +30,8 @@ y_test = pd.read_csv("data/y_test.csv",index_col = 0)
 y_mean = np.mean(y_test)
 
 model_choose = "model"
-#Predict Page
 
+#Predict Page
 def show_predict_page():
     st.title("Rating Predictions")
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> Model predict well if rating is bellow 100!</p>', unsafe_allow_html=True)
@@ -51,7 +42,7 @@ def show_predict_page():
     hits = st.number_input("Hits",step = 1)
     deaths = st.number_input("Deaths",step = 1)
     dmg_get = st.number_input("DMG Get",step = 1)
-    #Select box with models
+    #Model selection
     cheated = False
     cheated = st.checkbox("Cheated Model")
     if cheated:
