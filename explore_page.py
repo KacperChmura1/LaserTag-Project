@@ -11,6 +11,8 @@ from plotly.subplots import make_subplots
 import numpy as np
 from sklearn import metrics
 import tensorflow as tf
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
 def load_model(model_name):
     with open (model_name, "rb") as file:
         data = pickle.load(file)
@@ -19,6 +21,9 @@ def load_model(model_name):
 X_test = pd.read_csv("data/X_test.csv",index_col = 0)
 X_test_3 = pd.read_csv("data/X_test_3.csv",index_col = 0)
 y_test = pd.read_csv("data/y_test.csv",index_col = 0)
+X_train_ann  = pd.read_csv("data/X_train_ann.csv",index_col = 0)
+X_train_ann_3  = pd.read_csv("data/X_train_ann_3.csv",index_col = 0)
+X_test_ann_3 = pd.read_csv("data/X_test_ann_3.csv",index_col = 0)
 Linear_reg = load_model("Models/linear_regression.pkl")
 Linear_reg_3 = load_model("Models/linear_regression_3.pkl")
 forest = load_model("Models/forest.pkl")
@@ -29,7 +34,13 @@ SVRLinear = load_model("Models/SVRLinear.pkl")
 SVRLinear_3 = load_model("Models/SVRLinear_3.pkl")
 KNN = load_model("Models/KNN.pkl")
 KNN_3 = load_model("Models/KNN_3.pkl")
-ann = tf.keras.models.load_model("Models/ann.hdf5")
+def load_ann_model(model_name):
+    model = tf.keras.models.load_model(model_name)
+    return model
+ann = load_ann_model("Models/ann.hdf5")
+ann_3 = load_ann_model("Models/ann_3.hdf5")
+
+
 
 def proc(acc):
     acc = acc[:-1]
@@ -41,12 +52,47 @@ def load_data():
     return df
 
 df = load_data()
-def plots(model1,model2,name):
-    ratings = model1.predict(X_test)
-    ratings2 = model2.predict(X_test_3)
+def plots(model1,model2,name,ann_name):
+    X_test = pd.read_csv("data/X_test.csv",index_col = 0)
+    X_test_3 = pd.read_csv("data/X_test_3.csv",index_col = 0)
+    if ann_name == "ann":
+
+        ann = load_ann_model("Models/ann.hdf5")
+        ann_3 = load_ann_model("Models/ann_3.hdf5")
+        scaler = MinMaxScaler()
+        X_train_s = scaler.fit_transform(X_train_ann)
+        X_test = scaler.transform(X_test)
+        scaler2 = MinMaxScaler()
+        X_train_s_3 = scaler2.fit_transform(X_train_ann_3)
+        X_test_3 = scaler2.transform(X_test_3)
+        ratings = model1.predict(X_test)
+        ratings2 = model2.predict(X_test_3)
+        ratings_unpacked = []
+        for c in ratings:
+            for t in c:
+                ratings_unpacked.append(t)
+        ratings = ratings_unpacked
+        ratings2_unpacked = []
+        for c in ratings2:
+            for t in c:
+                ratings2_unpacked.append(t)
+        ratings2 = ratings2_unpacked
+    else: 
+        ratings = model1.predict(X_test)
+        ratings2 = model2.predict(X_test_3)
+
+    
+
     y_test_list = y_test.values.tolist()
-    ratings_list = ratings.tolist()
-    ratings_list2 = ratings2.tolist()
+    if ann_name != "ann":
+        ratings_list = ratings.tolist()
+        ratings_list2 = ratings2.tolist()
+    else:
+        ratings_list = ratings
+        ratings_list2 = ratings2
+        
+    
+
     y_test_unpacked = []
     for c in y_test_list:
         for t in c:
@@ -115,8 +161,9 @@ def show_explore_page():
     paragraph1 = "This project is based on machine learning models that are used for prediction. In this particular case of predicting the rating of players in the LaserTag games, it is a bit of an art for art's sake, because we know the exact formula for the real Rating. However, the project aims to prove how modern artificial intelligence copes with prediction."
     paragraph2 = "As we can see, the above pattern uses only three features(Hits, DMG_Get, Accuracy), while our model uses five(Hits, DMG_Get, Accuracy, Deaths, Shot fired). These five features are the basic statistics, and they were used to confuse our model. In the following, also a model using only these three features (cheated model) will be added and both will be compared."
     paragraph3 = "Let's see how the models and their cheated versions can handle the prediction."
-    paragraph4 = """As we can see in all cases, the cheated models lost to the regular models. Why is this happening? """
-    paragraph5 = "I will leave this as an open question."
+    paragraph4 = "Ann did the best, he has almost twice as good results as the second Gradient boost!"
+    paragraph5 = """As we can see in most cases, the cheated models lost to the regular models. Why is this happening? """
+    paragraph6 = "I will leave this as an open question."
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> {paragraph1} </p>', unsafe_allow_html=True)
     #Equation
     st.markdown(f'<p style="font-family:Courier; font-size: 30px;text-align:center;"> Real Formula </p>', unsafe_allow_html=True)
@@ -127,13 +174,16 @@ def show_explore_page():
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> {paragraph2} </p>', unsafe_allow_html=True)
     st.markdown(f'<p style="font-family:Courier; font-size: 30px;text-align:center;"> Comparison of models </p>', unsafe_allow_html=True)
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> {paragraph3} </p>', unsafe_allow_html=True)
-    plots(Linear_reg,Linear_reg_3,"Linear Regression")
-    plots(forest,forest_3,"Random Forest")
-    plots(gradient,gradient_3,"Gradient")
-    plots(SVRLinear,SVRLinear_3,"SVR Linear")
-    plots(KNN,KNN_3,"KNN")
+    plots(ann,ann_3,"ANN","ann")
+    plots(Linear_reg,Linear_reg_3,"Linear Regression",0)
+    plots(forest,forest_3,"Random Forest",0)
+    plots(gradient,gradient_3,"Gradient Boost",0)
+    plots(SVRLinear,SVRLinear_3,"SVR Linear",0)
+    plots(KNN,KNN_3,"KNN",0)
+    
     #plots(ann,ann,"ANN")
     #End comp. of Ann and Ann_3
-    
+    st.markdown(f'<p style="font-family:Courier; font-size: 30px;text-align:center;"> Thoughts</p>', unsafe_allow_html=True)
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;margin-top:50px;"> {paragraph4} </p>', unsafe_allow_html=True)
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> {paragraph5} </p>', unsafe_allow_html=True)
+    st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> {paragraph6} </p>', unsafe_allow_html=True)
