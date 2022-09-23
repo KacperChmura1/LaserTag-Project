@@ -1,3 +1,4 @@
+from pyexpat import model
 from unicodedata import decimal
 import streamlit as st
 import pandas as pd
@@ -10,22 +11,17 @@ import plotly.figure_factory as ff
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from sklearn.preprocessing import MinMaxScaler
-#Loading Data
-X_test = pd.read_csv("data/X_test.csv",index_col = 0)
-X_train = pd.read_csv("data/X_train_ann.csv",index_col = 0)
-y_train = pd.read_csv("data/y_train_ann.csv",index_col = 0)
-y_test = pd.read_csv("data/y_test.csv",index_col = 0)
+
 #Scaling Data
 scaler = MinMaxScaler()
-X_train = scaler.fit_transform(X_train)
-X_test_s = scaler.transform(X_test)
+
 #Loading model
-def load_model():
-    model = tf.keras.models.load_model("Models/ann.hdf5")
+def load_model(model_name):
+    model = tf.keras.models.load_model(model_name)
     return model
 #Whole ANN page
 def show_ann_page():
-    ann_model = load_model()
+    
     st.title("Rating Predictions")
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> Model predict well if rating is bellow 100!</p>', unsafe_allow_html=True)
 
@@ -36,6 +32,14 @@ def show_ann_page():
     deaths = st.number_input("Deaths",step = 1)
     dmg_get = st.number_input("DMG Get",step = 1)
     ok = st.button("Calculate Rating")
+    cheated = st.checkbox("Cheated Model")
+    if cheated:
+        model_name = "Models/ann_3.hdf5"
+    else:
+        model_name = "Models/ann.hdf5"
+
+    ann_model = load_model(model_name)
+
     #Avoid div by 0
     accuracy = 0
     if ok:
@@ -43,8 +47,20 @@ def show_ann_page():
             accuracy = 0
         else:
             accuracy = (hits / shot_fired)*100
-            
+        #Loading Data
+        X_test = pd.read_csv("data/X_test_ann.csv",index_col = 0)
+        X_train = pd.read_csv("data/X_train_ann.csv",index_col = 0)
+        X_train_3 = pd.read_csv("data/X_train_ann_3.csv",index_col = 0)
+        X_test_3 = pd.read_csv("data/X_test_ann_3.csv",index_col = 0)
+        y_test = pd.read_csv("data/y_test_ann.csv",index_col = 0)
+        y_test_3 = pd.read_csv("data/y_test_3.csv",index_col = 0)
         X = np.array([[accuracy,shot_fired,hits,deaths, dmg_get]])
+        X_train = scaler.fit_transform(X_train)
+        X_test_s = scaler.transform(X_test)
+        if model_name == "Models/ann_3.hdf5":
+            X = np.array([[accuracy,hits,dmg_get]])
+            X_train = scaler.fit_transform(X_train_3)
+            X_test_s = scaler.transform(X_test_3)
         #Predicting Inputed Vale
         X = scaler.transform(X)
         rating = ann_model.predict(X)
@@ -59,7 +75,7 @@ def show_ann_page():
         st.title("How good is our model")
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">For best results our model was tested with multiple layer layouts.</p>', unsafe_allow_html=True)
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">Here are the results:</p>', unsafe_allow_html=True)
-        
+
         ratings = ann_model.predict(X_test_s)
         #st.markdown(y_test)
         #st.markdown(ratings)
@@ -69,6 +85,10 @@ def show_ann_page():
             for t in c:
                 ratings_unpacked.append(t)
         #Metrics
+        if model_name == "Models/ann_3.hdf5":
+            mae = metrics.mean_absolute_error(y_test_3, ratings_unpacked)
+            rmse = np.sqrt(metrics.mean_squared_error(y_test_3, ratings_unpacked))
+            error_y_mean = (mae/np.mean(y_test_3))*100
         mae = metrics.mean_absolute_error(y_test, ratings_unpacked)
         rmse = np.sqrt(metrics.mean_squared_error(y_test, ratings_unpacked))
         error_y_mean = (mae/np.mean(y_test))*100
