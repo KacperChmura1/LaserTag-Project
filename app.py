@@ -5,7 +5,6 @@ from predict_page import show_predict_page
 from ann_page import show_ann_page
 #Pages choose
 page = st.sidebar.selectbox("Explore Or Predict", {"Explore","ML Predict","ANN Predict"})
-
 if page == "ML Predict":
     show_predict_page()
 elif page == "Explore":

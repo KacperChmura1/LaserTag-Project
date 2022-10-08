@@ -14,17 +14,14 @@ from sklearn.preprocessing import MinMaxScaler
 
 #Scaling Data
 scaler = MinMaxScaler()
-
 #Loading model
 def load_model(model_name):
     model = tf.keras.models.load_model(model_name)
     return model
 #Whole ANN page
-def show_ann_page():
-    
+def show_ann_page():   
     st.title("Rating Predictions")
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> Model predict well if rating is bellow 100!</p>', unsafe_allow_html=True)
-
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> I need some information to predict your rating:', unsafe_allow_html=True)
     #Stats from data  
     shot_fired = st.number_input("Shot fired",step = 1)
@@ -39,7 +36,6 @@ def show_ann_page():
         model_name = "Models/ann.hdf5"
 
     ann_model = load_model(model_name)
-
     #Avoid div by 0
     accuracy = 0
     if ok:
@@ -61,7 +57,7 @@ def show_ann_page():
             X = np.array([[accuracy,hits,dmg_get]])
             X_train = scaler.fit_transform(X_train_3)
             X_test_s = scaler.transform(X_test_3)
-        #Predicting Inputed Vale
+        #Predicting Inputed Value
         X = scaler.transform(X)
         rating = ann_model.predict(X)
         real_rating = (hits/(dmg_get + 1) * (accuracy*2+100))/3
@@ -75,16 +71,13 @@ def show_ann_page():
         st.title("How good is our model")
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">For best results our model was tested with multiple layer layouts.</p>', unsafe_allow_html=True)
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">Here are the results:</p>', unsafe_allow_html=True)
-
         ratings = ann_model.predict(X_test_s)
-        #st.markdown(y_test)
-        #st.markdown(ratings)
         ratings_list = ratings.tolist()
         ratings_unpacked = []
         for c in ratings_list:
             for t in c:
                 ratings_unpacked.append(t)
-        #Metrics
+        #Metrics(MAE, RMSE, ERROR)
         if model_name == "Models/ann_3.hdf5":
             mae = metrics.mean_absolute_error(y_test_3, ratings_unpacked)
             rmse = np.sqrt(metrics.mean_squared_error(y_test_3, ratings_unpacked))
@@ -95,17 +88,13 @@ def show_ann_page():
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">MAE: {mae:.2f}</p>', unsafe_allow_html=True)
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">RMSE: {rmse:.2f}</p>', unsafe_allow_html=True)
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">Error in %: {error_y_mean[0]:.2f}%</p>', unsafe_allow_html=True)
-        y_test_list = y_test.values.tolist()
-        
+        y_test_list = y_test.values.tolist()       
         y_test_unpacked = []
         for c in y_test_list:
             for t in c:
-                y_test_unpacked.append(t)
-        
-        #Display Results Plot with Plotly
-        
+                y_test_unpacked.append(t)      
+        #Display Results Plot with Plotly       
         fig3 = make_subplots(specs=[[{"secondary_y": True}]])
-
         # Add traces
         fig3.add_trace(
             go.Scatter(x=y_test_unpacked, y = ratings_unpacked, name="Predictions",mode = "markers",
@@ -124,5 +113,3 @@ def show_ann_page():
         title_text=f" Predictions vs True Values"
             )
         st.plotly_chart(fig3)
-        #Add model_3 to app
-        #Describe project in explore page!!!!
