@@ -22,20 +22,16 @@ def load_model(model_name):
 #Header
 def header(url):
      st.subheader(f'<p style="background-color:#0066cc;color:#33ff33;font-size:24px;border-radius:2%;">{url}</p>')
-
 #Loading Data to Check Model(avoid data leakage)
 X_test = pd.read_csv("data/X_test.csv",index_col = 0)
 X_test_3 = pd.read_csv("data/X_test_3.csv",index_col = 0)
 y_test = pd.read_csv("data/y_test.csv",index_col = 0)
 y_mean = np.mean(y_test)
-
 model_choose = "model"
-
 #Predict Page
 def show_predict_page():
     st.title("Rating Predictions")
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> Model predict well if rating is bellow 100!</p>', unsafe_allow_html=True)
-
     st.markdown(f'<p style="font-family:Courier; font-size: 20px;"> I need some information to predict your rating:', unsafe_allow_html=True)
     #Stats from data  
     shot_fired = st.number_input("Shot fired",step = 1)
@@ -48,9 +44,7 @@ def show_predict_page():
     if cheated:
         cheat_string = "_3.pkl"
     else:
-        cheat_string = ".pkl"
-    
-           
+        cheat_string = ".pkl"         
     model_choose = st.sidebar.selectbox("Model choose", {"Gradient Boost", "Linear Regression","Forest","KNN","SVR Linear"})
     if model_choose == "Gradient Boost":
         model_name = "Models/gradient"+cheat_string
@@ -67,7 +61,6 @@ def show_predict_page():
     elif model_choose == "SVR Linear":
         model_name = "Models/SVRLinear"+cheat_string
         model = load_model(model_name)
-
     ok = st.button("Calculate Rating")
     #Avoid div by 0
     if ok:
@@ -81,8 +74,7 @@ def show_predict_page():
         else:
             X = np.array([[accuracy,hits, dmg_get]])
         rating = model.predict(X)
-        real_rating = (hits/(dmg_get + 1) * (accuracy*2+100))/3
-        
+        real_rating = (hits/(dmg_get + 1) * (accuracy*2+100))/3       
         prediction = f'<p style="font-family:Courier; color:Red; font-size: 30px;">Model Predict: {rating[0]:.2f}</p>'
         true_value = f'<p style="font-family:Courier; color:Green; font-size: 30px;">Real Rating: {real_rating:.2f}</p>'
         #Display Results
@@ -103,7 +95,6 @@ def show_predict_page():
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">MAE: {mae:.2f}</p>', unsafe_allow_html=True)
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">RMSE: {rmse:.2f}</p>', unsafe_allow_html=True)
         st.markdown(f'<p style="font-family:Courier; font-size: 20px;">Error in %: {error_y_mean[0]:.2f}%</p>', unsafe_allow_html=True)
-
         #Display Results Plot with Plotly
         y_test_list = y_test.values.tolist()
         ratings_list = ratings.tolist()
@@ -112,7 +103,6 @@ def show_predict_page():
             for t in c:
                 y_test_unpacked.append(t)
         fig3 = make_subplots(specs=[[{"secondary_y": True}]])
-
         # Add traces
         fig3.add_trace(
             go.Scatter(x=y_test_unpacked, y = np.round(ratings_list,2), name="Predictions",mode = "markers",
@@ -131,8 +121,7 @@ def show_predict_page():
         title_text=f" {model_choose}: Predictions vs True Values"
         )
         st.plotly_chart(fig3)
-        #Add model_3 to app
-        #Describe project in explore page!!!!
+
         
 
         
